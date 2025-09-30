@@ -12,11 +12,11 @@ library(tidyverse)
 
 ## Problem 1 
 
-Import and clean `pols_month_df`
+Import `pols_month.csv`, create and clean `pols_month_df`
 
 ```{r}
 pols_month_df <- 
-  read.csv("data/pols-month.csv", na = c("NA", "")) |> 
+  read_csv("data/pols-month.csv", na = c("NA", "")) |> 
   janitor::clean_names() |> 
   separate(
     mon, into = c("year", "month", "day")) |> 
@@ -42,11 +42,11 @@ pols_month_df <-
   select(-prez_gop, -prez_dem, -day)
 ```
 
-Import and clean `snp.csv`
+Import `snp.csv`, create and clean `snp_df`
 
 ```{r}
 snp_df <-
-  read.csv("data/snp.csv", na = c("NA", "")) |> 
+  read_csv("data/snp.csv", na = c("NA", "")) |> 
   janitor::clean_names() |> 
   mutate(
     date = mdy(date))|> 
@@ -71,4 +71,31 @@ snp_df <-
   select(-day)
 ```
 
+Import `unemployment.csv`, create and clean `unemployment_df`
+
+```{r}
+unemployment_df <-
+  read_csv("data/unemployment.csv") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = jan:dec, 
+    names_to = "month",
+    values_to = "unemploy_rate") |> 
+  mutate(
+    month = case_match(
+      month, 
+      "jan" ~ "January",
+      "feb" ~ "February",
+      "mar" ~ "March",
+      "apr" ~ "April", 
+      "may" ~ "May", 
+      "jun" ~ "June", 
+      "jul" ~ "July", 
+      "aug" ~ "August", 
+      "sep" ~ "September", 
+      "oct" ~ "October", 
+      "nov" ~ "November", 
+      "dec" ~ "December")
+    )
+```
 
