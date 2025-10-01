@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 
@@ -119,3 +120,42 @@ The combined dataset `pol_economy_df` contains 822 observations of 11 variables 
 * `president` - the political party of the president at the time of the observed measurement
 * `close` - the closing value of the S&P at the time of the observed measurement
 * `unemploy_rate` - the percentage of unemployment at the time of the observed measurement
+
+
+## Problem 2
+
+Import and tidy Mr. Trashwheel data
+
+```{r}
+mr_trash_df <-
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx", 
+             sheet = "Mr. Trash Wheel", 
+             range = "A2:N709",
+             na = c("NA", "")) |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = plastic_bottles:sports_balls,
+    names_to = "litter_type",
+    values_to = "litter_type_count") |> 
+  mutate(
+    litter_type = case_match(
+      litter_type,
+      "plastic_bottles" ~ "plastic bottles",
+      "polystyrene" ~ "polystyrene", 
+      "cigarette_butts" ~ "cigarette butts", 
+      "glass_bottles" ~ "glass bottles", 
+      "plastic_bags" ~ "plastic bags", 
+      "wrappers" ~ "wrappers",
+      "sports_balls" ~ "sports balls"),
+    litter_type_count = as.integer(litter_type_count),
+    trash_wheel = "mr") |> 
+  select(-month, -year) |> 
+  separate(
+    date, into = c("collection_year", "collection_month", "collection_day")) |> 
+  rename(
+    total_weight = weight_tons, 
+    total_volume = volume_cubic_yards,
+    dumpster_number = dumpster) |> 
+  relocate(trash_wheel, .after = dumpster_number)
+```
+
