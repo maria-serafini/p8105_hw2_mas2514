@@ -290,3 +290,5 @@ zori_zip_df <-
   select(metro, state, city, county, zip_code, neighborhood, obs_date, zori)
 ```
 
+The `zori_zip` dataset contains 17516 observations of 8 variables including observed values of the Zillow Observed Rent Index (ZORI) across different counties, bouoroughs, and neighborhoods of NYC between January 2015 and August 2024. There are `r dplyr::n_distinct(zori_zip_df$zip_code)` unique zip codes and `r dplyr::n_distinct(zori_zip_df$neighborhood)` unique neighborhoods in the dataset. 
+
