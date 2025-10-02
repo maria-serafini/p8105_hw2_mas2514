@@ -292,3 +292,7 @@ zori_zip_df <-
 
 The `zori_zip` dataset contains 17516 observations of 8 variables including observed values of the Zillow Observed Rent Index (ZORI) across different counties, bouoroughs, and neighborhoods of NYC between January 2015 and August 2024. There are `r dplyr::n_distinct(zori_zip_df$zip_code)` unique zip codes and `r dplyr::n_distinct(zori_zip_df$neighborhood)` unique neighborhoods in the dataset. 
 
+The number of ZIP codes that appear in the ZIP code dataset but not in the Zillow ZORI dataset is `r nrow(anti_join(zip_codes_df, zori_df, by = "zip_code"))`. For example, some of these excluded ZIP codes are:  
+`r paste(head(anti_join(zip_codes_df, zori_df, by = "zip_code")$zip_code, 5), collapse = ", ")`. 
+
+These zipcodes may be excluded because the zillow data only focuses on the rental market so zip codes representing areas with a small rental market, areas that are typically commercial or office space (e.g. `10090 (World Trade Center)` ), or zipcodes in special-purpose zones such as industrial (e.g. `11251 (Brooklyn Navy Yard)`) zones would not be included in the zillow rental data. 
