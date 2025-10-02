@@ -124,7 +124,7 @@ The combined dataset `pol_economy_df` contains 822 observations of 11 variables 
 
 ## Problem 2
 
-Import and tidy Mr. Trashwheel data
+Read and clean Mr. Trashwheel data
 
 ```{r}
 mr_trash_df <-
@@ -159,3 +159,92 @@ mr_trash_df <-
   relocate(trash_wheel, .after = dumpster_number)
 ```
 
+read and clean`professor trashwheel` data
+
+```{r}
+prof_trash_df <-
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx", 
+             sheet = "Professor Trash Wheel", 
+             range = "A2:M134",
+             na = c("NA", "")) |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = plastic_bottles:wrappers,
+    names_to = "litter_type",
+    values_to = "litter_type_count") |> 
+  mutate(
+    litter_type = case_match(
+      litter_type,
+      "plastic_bottles" ~ "plastic bottles",
+      "polystyrene" ~ "polystyrene", 
+      "cigarette_butts" ~ "cigarette butts", 
+      "glass_bottles" ~ "glass bottles", 
+      "plastic_bags" ~ "plastic bags", 
+      "wrappers" ~ "wrappers"),
+    litter_type_count = as.integer(litter_type_count),
+    trash_wheel = "prof") |> 
+  select(-month, -year) |> 
+  separate(
+    date, into = c("collection_year", "collection_month", "collection_day")) |> 
+  rename(
+    total_weight = weight_tons, 
+    total_volume = volume_cubic_yards,
+    dumpster_number = dumpster) |> 
+  relocate(trash_wheel, .after = dumpster_number)
+```
+
+read and clean `gywnnda trashwheel` data
+
+```{r}
+gywnnda_trash_df <-
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx", 
+             sheet = "Gwynns Falls Trash Wheel", 
+             range = "A2:L351",
+             na = c("NA", "")) |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = plastic_bottles:wrappers,
+    names_to = "litter_type",
+    values_to = "litter_type_count") |> 
+  mutate(
+    litter_type = case_match(
+      litter_type,
+      "plastic_bottles" ~ "plastic bottles",
+      "polystyrene" ~ "polystyrene", 
+      "cigarette_butts" ~ "cigarette butts", 
+      "plastic_bags" ~ "plastic bags", 
+      "wrappers" ~ "wrappers"),
+    litter_type_count = as.integer(litter_type_count),
+    trash_wheel = "gywnnda") |> 
+  select(-month, -year) |> 
+  separate(
+    date, into = c("collection_year", "collection_month", "collection_day")) |> 
+  rename(
+    total_weight = weight_tons, 
+    total_volume = volume_cubic_yards,
+    dumpster_number = dumpster) |> 
+  relocate(trash_wheel, .after = dumpster_number)
+  
+```
+
+merge datasets and save total litter for mr trash wheel for inline printing
+
+```{r}
+trash_wheel_df <- bind_rows(mr_trash_df, prof_trash_df, gywnnda_trash_df)
+```
+
+__The `trash wheel` dataframe has 7486 observations of 10 variables.__
+
+* `dumpster_number` - number of the dumpster
+* `trash_wheel` - the specific water-wheel vessel that collected the litter (mr, prof, gywnnda)
+* `collection_year` - the year of the litter collection (`r range(pull(trash_wheel_df, collection_year))`)
+* `collection_month` - the month of the litter collection
+* `collection_day` - the day of the litter collection
+* `total_weight` - total weight of litter collected from a given dumpster on the given collection date 
+* `total_volume` - total volume of litter collected from a given dumpster on the given collection date 
+* `homes_powered` - number of homes powered by the incineration of the collected litter
+* `litter_type` - the type of litter (plastic bottles, polystyrene, cigarette butts, glass bottles, plastic bags, wrappers, sports balls)
+* `litter_count` - the count of the litter type from a given dumpster on the given collection date
+
+The total weight of litter collected by mr trash wheel was `2,283.84` tons. 
+The total number of cigarette butts collected by gywnnda trash wheel in june of 2022 was `18,120`.
