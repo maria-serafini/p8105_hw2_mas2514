@@ -248,3 +248,45 @@ __The `trash wheel` dataframe has 7486 observations of 10 variables.__
 
 The total weight of litter collected by mr trash wheel was `2,283.84` tons. 
 The total number of cigarette butts collected by gywnnda trash wheel in june of 2022 was `18,120`.
+
+
+## Problem 3 
+
+import and clean zillow zori data for NYC
+
+```{r}
+zori_df <-
+  read_csv("data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv", na = c("NA", "")) |>
+  pivot_longer(
+    cols = matches("^20\\d{2}-\\d{2}-\\d{2}$"),
+    names_to = "obs_date",
+    values_to = "zori") |> 
+  janitor::clean_names() |> 
+  rename(
+    zip_code = region_name) |> 
+  select(-region_type, -state_name) |> 
+  relocate(zip_code) |> 
+  mutate(
+    county = str_remove(county_name, "\\County")
+  ) |> 
+  select(-county_name)
+```
+
+import and clean zip data for NYC
+
+```{r}
+zip_codes_df <-
+  read_csv("data/Zip Codes.csv", na = c("NA", "")) |> 
+  janitor::clean_names() |> 
+  relocate(zip_code) |> 
+  select(-state_fips, -county_code, -county_fips, -file_date, -county)
+```
+
+merge datasets
+
+```{r}
+zori_zip_df <- 
+  left_join(zori_df, zip_codes_df, by = "zip_code", relationship = "many-to-many") |> 
+  select(metro, state, city, county, zip_code, neighborhood, obs_date, zori)
+```
+
