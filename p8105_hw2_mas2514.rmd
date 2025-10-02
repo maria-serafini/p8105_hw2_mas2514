@@ -13,7 +13,7 @@ library(readxl)
 
 ## Problem 1 
 
-Import `pols_month.csv`, create and clean `pols_month_df`
+__This chunk imports the `pols_month.csv` dataset from FiveThirtyEight and creates a clean the `pols_month_df` dataframe__
 
 ```{r}
 pols_month_df <- 
@@ -43,7 +43,8 @@ pols_month_df <-
   select(-prez_gop, -prez_dem, -day)
 ```
 
-Import `snp.csv`, create and clean `snp_df`
+#
+__This chunk imports the `snp.csv` dataset from FiveThirtyEight, and creates a clean `snp_df` dataframe__
 
 ```{r}
 snp_df <-
@@ -72,7 +73,8 @@ snp_df <-
   select(-day)
 ```
 
-Import `unemployment.csv`, create and clean `unemployment_df`
+#
+__This chunk imports the `unemployment.csv` dataset and creates a clean `unemployment_df` dataframe__
 
 ```{r}
 unemployment_df <-
@@ -101,7 +103,8 @@ unemployment_df <-
     )
 ```
 
-Join datasets `pols` and `snp`, merge `unemployment`
+#
+__This chunk joins the datasets `pols_month_df` and `snp_df`, and merges `unemployment_df` with the result__
 
 ```{r}
 pols_snp_df <-
@@ -115,6 +118,7 @@ pol_economy_df <-
 The dataset `pols-month` contained 822 observations of 9 variables related to the number of national politicians who are democratic or republican at any given time. The dataset `snp` contained 787 observations of 2 variables related to Standard & Poor’s stock market index (S&P), often used as a representative measure of stock market as a whole and included two variables, `date` representing the date of the observation and `close` representing the closing value of the S&P on the associated date. The dataset `unemployment` contained 68 observations of 13 variables, including `year` representing the year of the measurement for each row of observation and the percentage of unemployment for each month of the associated year. 
 
 The combined dataset `pol_economy_df` contains 822 observations of 11 variables representing political and economic data from `r min(pull(pols_month_df, year))` to `r max(pull(pols_month_df, year))`. Key variables include:
+
 * `year` - the year of the observed measurement
 * `month` - the month of the observed measurement
 * `president` - the political party of the president at the time of the observed measurement
@@ -124,7 +128,7 @@ The combined dataset `pol_economy_df` contains 822 observations of 11 variables 
 
 ## Problem 2
 
-Read and clean Mr. Trashwheel data
+__This chunk reads the `Mr. Trash Wheel` dataset and creates a clean `mr_trash_df` dataframe__
 
 ```{r}
 mr_trash_df <-
@@ -159,7 +163,8 @@ mr_trash_df <-
   relocate(trash_wheel, .after = dumpster_number)
 ```
 
-read and clean`professor trashwheel` data
+#
+__This chunk reads the `Professor Trash Wheel` data and creates clean`prof_trash_df` dataframe__
 
 ```{r}
 prof_trash_df <-
@@ -193,10 +198,11 @@ prof_trash_df <-
   relocate(trash_wheel, .after = dumpster_number)
 ```
 
-read and clean `gywnnda trashwheel` data
+#
+__This chunk reads the `Gwynns Falls Trash Wheel` data and creates clean `gywnnda_trash_df` dataframe__
 
 ```{r}
-gywnnda_trash_df <-
+gwynnda_trash_df <-
   read_excel("data/202509 Trash Wheel Collection Data.xlsx", 
              sheet = "Gwynns Falls Trash Wheel", 
              range = "A2:L351",
@@ -215,7 +221,7 @@ gywnnda_trash_df <-
       "plastic_bags" ~ "plastic bags", 
       "wrappers" ~ "wrappers"),
     litter_type_count = as.integer(litter_type_count),
-    trash_wheel = "gywnnda") |> 
+    trash_wheel = "gwynnda") |> 
   select(-month, -year) |> 
   separate(
     date, into = c("collection_year", "collection_month", "collection_day")) |> 
@@ -227,16 +233,17 @@ gywnnda_trash_df <-
   
 ```
 
-merge datasets and save total litter for mr trash wheel for inline printing
+#
+__This chunk merges `mr_trash_df`, `prof_trash_df` and `gwynnda_trash_df` into a single clean dataframe `trash_wheel_df`__
 
 ```{r}
-trash_wheel_df <- bind_rows(mr_trash_df, prof_trash_df, gywnnda_trash_df)
+trash_wheel_df <- bind_rows(mr_trash_df, prof_trash_df, gwynnda_trash_df)
 ```
 
 __The `trash wheel` dataframe has 7486 observations of 10 variables.__
 
 * `dumpster_number` - number of the dumpster
-* `trash_wheel` - the specific water-wheel vessel that collected the litter (mr, prof, gywnnda)
+* `trash_wheel` - the specific water-wheel vessel that collected the litter (mr, prof, gwynnda)
 * `collection_year` - the year of the litter collection (`r range(pull(trash_wheel_df, collection_year))`)
 * `collection_month` - the month of the litter collection
 * `collection_day` - the day of the litter collection
@@ -247,20 +254,20 @@ __The `trash wheel` dataframe has 7486 observations of 10 variables.__
 * `litter_count` - the count of the litter type from a given dumpster on the given collection date
 
 The total weight of litter collected by mr trash wheel was `2,283.84` tons. 
-The total number of cigarette butts collected by gywnnda trash wheel in june of 2022 was `18,120`.
+The total number of cigarette butts collected by gwynnda trash wheel in June of 2022 was `18,120`.
 
 
 ## Problem 3 
 
-import and clean zillow zori data for NYC
+__This chunk reads the `Zillow Observed Rent Index (ZORI)` data for NYC from January 2015 and August 2024 and creates a clean `nyc_zori_df` dataframe__
 
 ```{r}
-zori_df <-
+nyc_zori_df <-
   read_csv("data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv", na = c("NA", "")) |>
   pivot_longer(
     cols = matches("^20\\d{2}-\\d{2}-\\d{2}$"),
     names_to = "obs_date",
-    values_to = "zori") |> 
+    values_to = "obs_rent_index") |> 
   janitor::clean_names() |> 
   rename(
     zip_code = region_name) |> 
@@ -272,27 +279,26 @@ zori_df <-
   select(-county_name)
 ```
 
-import and clean zip data for NYC
+__This chunk reads the `Zip Codes` data and creates a clean `nyc_zipcodes_df` datafame__
 
 ```{r}
-zip_codes_df <-
+nyc_zipcodes_df <-
   read_csv("data/Zip Codes.csv", na = c("NA", "")) |> 
   janitor::clean_names() |> 
   relocate(zip_code) |> 
   select(-state_fips, -county_code, -county_fips, -file_date, -county)
 ```
 
-merge datasets
+__This chunk merges the `zori_df` and `nyc_zipcodes_df` dataframes to one clean `nyc_rent_index_df`__
 
 ```{r}
-zori_zip_df <- 
-  left_join(zori_df, zip_codes_df, by = "zip_code", relationship = "many-to-many") |> 
-  select(metro, state, city, county, zip_code, neighborhood, obs_date, zori)
+nyc_rent_index_df <- 
+  left_join(nyc_zori_df, nyc_zipcodes_df, by = "zip_code", relationship = "many-to-many") |> 
+  select(metro, state, city, county, zip_code, neighborhood, obs_date, obs_rent_index)
 ```
 
-The `zori_zip` dataset contains 17516 observations of 8 variables including observed values of the Zillow Observed Rent Index (ZORI) across different counties, bouoroughs, and neighborhoods of NYC between January 2015 and August 2024. There are `r dplyr::n_distinct(zori_zip_df$zip_code)` unique zip codes and `r dplyr::n_distinct(zori_zip_df$neighborhood)` unique neighborhoods in the dataset. 
+The `nyc_rent_index` dataset contains 17516 observations of 8 variables including observed values of the Zillow Observed Rent Index (ZORI) across different counties, boroughs, and neighborhoods of NYC between January 2015 and August 2024. There are '`r dplyr::n_distinct(nyc_rent_index_df$zip_code)`' unique zip codes and '`r dplyr::n_distinct(nyc_rent_index_df$neighborhood)`' unique neighborhoods in the dataset. 
 
-The number of ZIP codes that appear in the ZIP code dataset but not in the Zillow ZORI dataset is `r nrow(anti_join(zip_codes_df, zori_df, by = "zip_code"))`. For example, some of these excluded ZIP codes are:  
-`r paste(head(anti_join(zip_codes_df, zori_df, by = "zip_code")$zip_code, 5), collapse = ", ")`. 
-
-These zipcodes may be excluded because the zillow data only focuses on the rental market so zip codes representing areas with a small rental market, areas that are typically commercial or office space (e.g. `10090 (World Trade Center)` ), or zipcodes in special-purpose zones such as industrial (e.g. `11251 (Brooklyn Navy Yard)`) zones would not be included in the zillow rental data. 
+The number of zipcodes that appear in the `nyc_zipcodes` dataset but not in the `nyc_zori` dataset is `r nrow(anti_join(nyc_zipcodes_df, nyc_zori_df, by = "zip_code"))`. For example, some of these excluded ZIP codes are:  
+`r paste(head(anti_join(nyc_zipcodes_df, nyc_zori_df, by = "zip_code")$zip_code, 5), collapse = ", ")`. 
+Since the Zillow Observed Rent Index (ZORI) only measures the observed market rate rent, certain zipcodes may be excluded when there is not a sufficient rental market. This could include areas that are typically majority commercial or office space (e.g. `10090 (World Trade Center)`), special-purpose zones such as industrial zones (e.g. `11251 (Brooklyn Navy Yard)`), or areas with small rental markets. 
